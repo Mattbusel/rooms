@@ -1,0 +1,1 @@
+home,inventory,insurance,claim,belongings,possessions,valuables,renters,homeowners,serial,receipts
