@@ -133,8 +133,11 @@ struct RoomView: View {
             } else {
                 VStack(spacing: 0) { ForEach(its) { it in ItemRow(item: it) } }.box(padding: 6)
             }
-            InkButton(title: "Add to \(room.name)", icon: "camera.fill", tint: Paper.accent) { router.newRoomID = room.id; router.creating = true }
+            Text("The plus button adds to this room.").font(.ui(12)).foregroundStyle(Paper.dim)
         }
+        .navigationBarBackButtonHidden(true).toolbar(.hidden, for: .navigationBar)
+        .onAppear { router.newRoomID = room.id }
+        .onDisappear { if router.path.isEmpty { router.newRoomID = nil } }
         .alert("Delete \(room.name) and its \(its.count) items?", isPresented: $confirm) {
             Button("Delete", role: .destructive) { store.deleteRoom(room); dismiss() }
             Button("Keep", role: .cancel) {}
@@ -211,6 +214,7 @@ struct ItemView: View {
                 if !it.notes.isEmpty { VStack(alignment: .leading, spacing: 6) { Eyebrow("Notes"); Text(it.notes).font(.ui(14)).foregroundStyle(Paper.ink) }.box() }
                 Button { confirm = true } label: { Text("Remove from inventory").font(.ui(13, .bold)).foregroundStyle(Paper.red).frame(maxWidth: .infinity).padding(12) }.buttonStyle(.plain)
             }
+            .navigationBarBackButtonHidden(true).toolbar(.hidden, for: .navigationBar)
             .alert("Remove \(it.name)?", isPresented: $confirm) {
                 Button("Remove", role: .destructive) { store.delete(it); dismiss() }
                 Button("Keep", role: .cancel) {}
