@@ -6,6 +6,8 @@ No account, login or network connection is required.
 
 HOW TO USE: The Inventory tab shows your rooms. Tap a room, then the terracotta plus button to add an item: take a photo or pick one from the library, type a name and a replacement value, save. Tap the home name at the top to enter your policy details (contents cover, deductible, category caps). The Coverage tab checks your totals against those limits, Value shows depreciated worth and what is missing for a claim, and Report makes a PDF and a CSV to share.
 
+IN-APP PURCHASE: the app is free. One non-consumable, "Rooms Pro" (com.mattbusel.rooms.pro), unlocks more than 40 items, the PDF claim report and the CSV spreadsheet. Everything else is free, and items already listed are never hidden. To see the paywall: Report tab, tap "Make the PDF report" or "Make a spreadsheet (CSV)". Restore purchase is on the paywall and on the Rooms Pro card at the bottom of the Report tab. The review recording runs with Pro unlocked.
+
 PRIVACY: no data is collected. Everything is stored in the app's Documents folder on the device (a JSON file plus JPEG photos). The camera and photo library are used only to attach photos to the user's own inventory, and only when the user taps Camera or Library. No network requests are made.
 
 2. PURPOSE AND TARGET AUDIENCE
