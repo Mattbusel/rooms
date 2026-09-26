@@ -349,6 +349,7 @@ struct ValueView: View {
 
 struct ReportView: View {
     @Environment(Store.self) private var store
+    @Environment(Pro.self) private var pro
     @State private var pdf: URL? = nil
     @State private var csv: URL? = nil
     @State private var busy = false
@@ -365,12 +366,12 @@ struct ReportView: View {
                 if let pdf {
                     ShareLink(item: pdf) { HStack(spacing: 8) { Image(systemName: "square.and.arrow.up").font(.system(size: 14, weight: .bold)); Text("Share the PDF").font(.ui(15, .bold)) }.foregroundStyle(Paper.card).frame(maxWidth: .infinity).padding(.vertical, 15).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Paper.ink)) }
                 } else {
-                    InkButton(title: busy ? "Making the report…" : "Make the PDF report", icon: "doc.richtext") { busy = true; Task { @MainActor in pdf = Report.pdf(store); busy = false } }
+                    InkButton(title: busy ? "Making the report…" : "Make the PDF report", icon: "doc.richtext") { guard pro.allow(.report) else { return }; busy = true; Task { @MainActor in pdf = Report.pdf(store); busy = false } }
                 }
                 if let csv {
                     ShareLink(item: csv) { HStack(spacing: 8) { Image(systemName: "tablecells").font(.system(size: 13, weight: .bold)); Text("Share the spreadsheet (CSV)").font(.ui(13, .bold)) }.foregroundStyle(Paper.ink).frame(maxWidth: .infinity).padding(.vertical, 12).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Paper.card)).overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Paper.line2)) }
                 } else {
-                    Button { csv = Report.csv(store) } label: { HStack(spacing: 8) { Image(systemName: "tablecells").font(.system(size: 13, weight: .bold)); Text("Make a spreadsheet (CSV)").font(.ui(13, .bold)) }.foregroundStyle(Paper.ink).frame(maxWidth: .infinity).padding(.vertical, 12).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Paper.card)).overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Paper.line2)) }.buttonStyle(.plain)
+                    Button { if pro.allow(.csv) { csv = Report.csv(store) } } label: { HStack(spacing: 8) { Image(systemName: "tablecells").font(.system(size: 13, weight: .bold)); Text("Make a spreadsheet (CSV)").font(.ui(13, .bold)) }.foregroundStyle(Paper.ink).frame(maxWidth: .infinity).padding(.vertical, 12).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Paper.card)).overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Paper.line2)) }.buttonStyle(.plain)
                 }
             }
             HStack {
@@ -391,6 +392,7 @@ struct ReportView: View {
                 if !store.home.claimsPhone.isEmpty { Text("Claims line: " + store.home.claimsPhone + " · Policy " + store.home.policy).font(.num(12, .semibold)).foregroundStyle(Paper.ink).padding(.top, 6) }
                 Text(money(store.total, sym) + " is what you would be claiming today. Keep this list current.").font(.ui(12)).foregroundStyle(Paper.dim)
             }.box()
+            ProCard()
         }
     }
 }

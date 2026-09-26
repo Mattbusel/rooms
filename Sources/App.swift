@@ -5,13 +5,20 @@ import Observation
 struct RoomsApp: App {
     @State private var store: Store
     @State private var router = Router()
+    @State private var pro: Pro
     init() {
         let a = ProcessInfo.processInfo.arguments
-        _store = State(initialValue: Store(demo: a.contains("-shot") || a.contains("-demoAutoplay")))
+        let demo = a.contains("-shot") || a.contains("-demoAutoplay")
+        _store = State(initialValue: Store(demo: demo))
+        // Screenshots and the review recording never touch StoreKit. The paywall shot shows the free app.
+        let paywallShot = a.firstIndex(of: "-shot").map { $0 + 1 < a.count && a[$0 + 1] == "paywall" } ?? false
+        let p = demo ? Pro(forced: !paywallShot) : Pro()
+        if paywallShot { p.paywall = .report }
+        _pro = State(initialValue: p)
     }
     var body: some Scene {
         WindowGroup {
-            RootView().environment(store).environment(router).preferredColorScheme(.light).tint(Paper.ink)
+            RootView().environment(store).environment(router).environment(pro).preferredColorScheme(.light).tint(Paper.ink)
                 .onAppear { router.applyShotArgs(store); Autopilot.shared.run(store, router) }
         }
     }
@@ -49,7 +56,7 @@ final class Router {
         case "item": path = [.room(kitchen.id), .item(hero.id)]
         case "coverage": tab = .coverage
         case "value": tab = .value
-        case "report": tab = .report
+        case "report", "paywall": tab = .report
         case "add": creating = true
         default: break
         }
@@ -59,8 +66,10 @@ final class Router {
 struct RootView: View {
     @Environment(Store.self) private var store
     @Environment(Router.self) private var router
+    @Environment(Pro.self) private var pro
     var body: some View {
         @Bindable var router = router
+        @Bindable var pro = pro
         ZStack(alignment: .bottom) {
             PaperBackground()
             Group {
@@ -71,13 +80,17 @@ struct RootView: View {
                 case .report: ReportView()
                 }
             }
-            Rail(selection: $router.tab) { router.creating = true }.padding(.bottom, 2)
+            Rail(selection: $router.tab) {
+                guard store.items.count < Pro.freeItems || pro.allow(.items) else { return }
+                router.creating = true
+            }.padding(.bottom, 2)
         }
         .sheet(item: $router.editing) { it in ItemEditor(item: it, isNew: false).presentationBackground(Paper.bg).presentationDetents([.large]) }
         .sheet(isPresented: $router.creating) {
             ItemEditor(item: Item(name: "", roomID: router.newRoomID ?? store.rooms.first?.id ?? UUID()), isNew: true).presentationBackground(Paper.bg).presentationDetents([.large])
         }
         .sheet(isPresented: $router.editingHome) { HomeEditor().presentationBackground(Paper.bg).presentationDetents([.large]) }
+        .sheet(item: $pro.paywall) { r in PaywallView(reason: r).presentationBackground(Paper.bg) }
     }
 }
 
