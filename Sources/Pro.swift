@@ -151,10 +151,11 @@ struct PaywallView: View {
                     schedule
                         .overlay(alignment: .bottomTrailing) {
                             Text("COVERED")
-                                .font(.system(size: 30, weight: .black, design: .serif)).tracking(3)
-                                .foregroundStyle(Paper.accent.opacity(0.85))
-                                .padding(.horizontal, 12).padding(.vertical, 4)
-                                .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Paper.accent.opacity(0.85), lineWidth: 3))
+                                .font(.system(size: 22, weight: .black, design: .serif)).tracking(3)
+                                .foregroundStyle(Paper.accent.opacity(0.4))
+                                .padding(.horizontal, 10).padding(.vertical, 3)
+                                .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Paper.accent.opacity(0.4), lineWidth: 2.5))
+                                .allowsHitTesting(false)
                                 .rotationEffect(.degrees(-12))
                                 .scaleEffect(stamped ? 1 : 2.2).opacity(stamped ? 1 : 0)
                                 .padding(18)
